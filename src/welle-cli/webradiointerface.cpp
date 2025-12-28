@@ -402,7 +402,10 @@ static string trim(const string& str) {
 
 static string get_base_uri(const map<string,string>& headers) {
     if (headers.find("Referer") != headers.end()) {
-        return headers.at("Referer");
+        string referer = headers.at("Referer");
+        if (referer.back() != '/')
+            referer += '/';
+        return referer;
     } else if (headers.find("Host") != headers.end()) {
         return "http://" + headers.at("Host") + "/";
     } else {
