@@ -76,8 +76,5 @@ modules:
       - '-DRTLSDR=ON'
       - '-DSOAPYSDR=ON'
     sources:
-      - type: git
-        url: https://github.com/AlbrechtL/welle.io.git
-        commit: 512558d1f8ac4c524d3c63e97510ea36c1bd7a70
-      - type: patch
-        path: patches/add-version-and-git-hash-to-appdata.patch
+      - type: dir
+        path: .
