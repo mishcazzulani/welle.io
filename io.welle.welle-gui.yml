@@ -19,6 +19,8 @@ modules:
 
   - name: libfaad
     buildsystem: cmake-ninja
+    config-opts:
+      - '-DCMAKE_INSTALL_LIBDIR=lib'
     sources:
       - type: git
         url: 'https://salsa.debian.org/multimedia-team/faad2.git'
@@ -27,6 +29,7 @@ modules:
   - name: librtlsdr
     buildsystem: cmake-ninja
     config-opts:
+      - '-DCMAKE_INSTALL_LIBDIR=lib'
       - '-DDETACH_KERNEL_DRIVER=ON'
       - '-Wno-dev'
     sources:
@@ -62,6 +65,7 @@ modules:
     buildsystem: cmake-ninja
     config-opts:
       - '-DCMAKE_BUILD_TYPE=Release'
+      - '-DCMAKE_INSTALL_LIBDIR=lib'
       - '-DCMAKE_POLICY_VERSION_MINIMUM=3.5'
       - '-Wno-dev'
     sources:
