@@ -76,6 +76,7 @@ modules:
   - name: SoapyHackRF
     buildsystem: cmake-ninja
     config-opts:
+      - '-DCMAKE_INSTALL_LIBDIR=lib'
       - '-Wno-dev'
     sources:
       - type: git
@@ -85,6 +86,7 @@ modules:
   - name: SoapyRemote
     buildsystem: cmake-ninja
     config-opts:
+      - '-DCMAKE_INSTALL_LIBDIR=lib'
       - '-DCMAKE_POLICY_VERSION_MINIMUM=3.5'
       - '-Wno-dev'
     sources:
