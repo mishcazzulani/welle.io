@@ -89,7 +89,7 @@ jobs:
           flatpak run --command=flatpak-builder-lint org.flatpak.Builder repo repo
         
       - name: Archive artifacts (welle.io Flatpak)
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: welle.io Flatpak (${{ env.ARCH_SUFFIX }})
           path: publish/*
