@@ -575,7 +575,12 @@ bool WebRadioInterface::dispatch_client(Socket&& client)
             }
         }
         else if (req.is_post) {
-            if (req.url == "/channel") {
+            if (req.url == "/restart") {
+                send_http_response(s, http_ok, "Restarting...\r\n");
+                raise(SIGTERM);
+                success = true;
+            }
+            else if (req.url == "/channel") {
                 success = handle_channel_post(s, req.post_data);
             }
             else if (req.url == "/fftwindowplacement") {
@@ -818,6 +823,7 @@ bool WebRadioInterface::send_mux_json(Socket& s)
 
         pending_messages.clear();
 
+        mux_json.demodulator_synced = synced;
         mux_json.demodulator_snr = last_snr;
         mux_json.demodulator_frequencycorrection = last_fine_correction + last_coarse_correction;
         mux_json.demodulator_timelastfct0frame = rx->getReceiverStats().timeLastFCT0Frame;

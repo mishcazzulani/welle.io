@@ -1,76 +1,443 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <title>welle-cli webfrontend</title>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
         <link rel="icon" type="image/x-icon" href="favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-body {
-    background-color: linen;
-    font-family: Verdana, sans-serif;
-    font-size: 8pt;
+/* ── Reset & Base ─────────────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
+
+body {
+    background-color: #0f1117;
+    color: #e0e0e6;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+    -webkit-text-size-adjust: 100%;
+}
+
+a {
+    color: #6ea8fe;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+a:hover {
+    color: #9ec5fe;
+    text-decoration: underline;
+}
+
+h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #f0f0f5;
+    margin-bottom: 4px;
+}
+h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #c0c0cc;
+    margin: 0;
+}
+
+/* ── Layout ───────────────────────────────────────── */
+.app-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px;
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #2a2d3a;
+}
+
+.app-header .brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f0f0f5;
+    letter-spacing: -0.02em;
+}
+.app-header .brand span {
+    color: #6ea8fe;
+}
+
+/* ── Controls Bar ─────────────────────────────────── */
+.controls-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    background: #1a1d28;
+    border: 1px solid #2a2d3a;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.control-group label {
+    font-size: 15px;
+    font-weight: 500;
+    color: #8888a0;
+    white-space: nowrap;
+}
+
+select {
+    appearance: none;
+    background: #252836;
+    border: 1px solid #3a3d4a;
+    border-radius: 8px;
+    color: #e0e0e6;
+    padding: 10px 36px 10px 14px;
+    font-size: 15px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238888a0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+select:hover {
+    border-color: #6ea8fe;
+}
+select:focus {
+    outline: none;
+    border-color: #6ea8fe;
+    box-shadow: 0 0 0 3px rgba(110, 168, 254, 0.15);
+}
+
+/* Le sélecteur de canal est court (ex: "5A") : pas d'étirement */
+#channelselector {
+    width: auto;
+    flex: 0 0 auto;
+}
+
+input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    accent-color: #6ea8fe;
+    cursor: pointer;
+}
+
+.links-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 13px;
+}
+.links-bar a {
+    background: #252836;
+    border: 1px solid #3a3d4a;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 14px;
+    transition: background 0.2s, border-color 0.2s;
+}
+.links-bar a:hover {
+    background: #2e3145;
+    border-color: #6ea8fe;
+    text-decoration: none;
+}
+
+/* ── Header card (desktop: transparent, mobile: unified card) ── */
+.header-card {
+    display: contents;
+}
+
+/* ── Mux Info & Ensemble Info ─────────────────────── */
+#mux-info {
+    margin-bottom: 20px;
+}
+#ensembleinfo {
+    margin-bottom: 20px;
+}
+
+#mux-info h1 {
+    margin-bottom: 2px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #22c55e;
+    letter-spacing: -0.01em;
+    text-align: center;
+}
+#mux-info h2 {
+    margin-bottom: 12px;
+    font-size: 1rem;
+    color: #86efac;
+    text-align: center;
+}
+
+/* ── Tables ───────────────────────────────────────── */
 table, th, td {
-    border: 1px solid black;
+    border: none;
     border-collapse: collapse;
 }
-th, td {
-    padding: 5px;
-    text-align: left;
-}
-th#dls {
-     width: 300px;
-}
-table#servicetable tr:nth-child(even) {
-    background-color: #eee;
-}
-table#servicetable tr:nth-child(odd) {
-    background-color: linen;
+table#servicetable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    border: 1px solid #2a2d3a;
 }
 table#servicetable th {
-    color: white;
-    background-color: #444;
+    background: #1e2130;
+    color: #9898b0;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 2px solid #2a2d3a;
 }
-button.disabled {
-    background-color: #885555;
+th#dls {
+    width: 300px;
 }
+table#servicetable td {
+    padding: 12px 14px;
+    font-size: 15px;
+    border-bottom: 1px solid #1e2130;
+    vertical-align: middle;
+}
+table#servicetable tr:nth-child(even) {
+    background-color: #151821;
+}
+table#servicetable tr:nth-child(odd) {
+    background-color: #12141d;
+}
+table#servicetable tr:hover {
+    background-color: #1c1f2e;
+}
+
+/* ── Stats table (Ensemble ID, ECC…) card style ─── */
+table.stats-table {
+    width: 100%;
+    background: #1a1d28;
+}
+table.stats-table th {
+    background: transparent;
+    color: #6868a0;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 14px 4px;
+    border-bottom: none;
+    text-align: left;
+}
+table.stats-table td {
+    color: #c8c8e0;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 14px 12px;
+    border-bottom: none;
+    background: transparent;
+}
+table.stats-table tr:nth-child(even),
+table.stats-table tr:nth-child(odd) {
+    background: transparent;
+}
+table.stats-table tr:hover {
+    background: transparent;
+}
+
+/* ── Buttons ──────────────────────────────────────── */
 button {
-    background-color: #F44336;
+    background: linear-gradient(135deg, #4f8cff, #3366cc);
     border: none;
-    color: white;
-    padding: 2px 4px;
+    color: #fff;
+    padding: 10px 22px;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
-    font-size: 7pt;
-    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+    box-shadow: 0 2px 8px rgba(79, 140, 255, 0.2);
 }
-canvas {
-    border: 1px solid #d3d3d3;
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(79, 140, 255, 0.35);
+    background: linear-gradient(135deg, #5e99ff, #4477dd);
+}
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(79, 140, 255, 0.15);
+}
+
+/* Play buttons */
+button[onclick^="setPlayerSource"] {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+    min-width: 70px;
+}
+button[onclick^="setPlayerSource"]:hover {
+    background: linear-gradient(135deg, #34d76e, #22b855);
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+}
+button[onclick^="setPlayerSource"]::before {
+    content: "\25B6";
+    font-size: 12px;
+}
+
+/* Stop button */
+button[onclick="stopPlayer()"] {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    padding: 8px 18px;
+    font-size: 14px;
+    min-width: 70px;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+button[onclick="stopPlayer()"]:hover {
+    background: linear-gradient(135deg, #f55, #e53535);
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35);
+}
+button[onclick="stopPlayer()"]::before {
+    content: "\25A0";
+    font-size: 12px;
+}
+
+/* SLS inline thumbnail */
+.sls-cell {
+    text-align: center;
+    vertical-align: middle;
+}
+.sls-thumb {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid #3a3d50;
+    transition: opacity 0.3s;
+    display: block;
+}
+.sls-thumb:hover {
+    opacity: 0.8;
+}
+
+button.disabled, button:disabled {
+    background: #2a2d3a;
+    color: #55556a;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+button.disabled:hover, button:disabled:hover {
+    background: #2a2d3a;
+    box-shadow: none;
+    transform: none;
+}
+button.disabled::before, button:disabled::before {
+    content: none;
+}
+
+/* ── Graph Blocks ─────────────────────────────────── */
+.block_graph {
+    background: #1a1d28;
+    border: 1px solid #2a2d3a;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+.block_graph:hover {
+    border-color: #3a3d50;
+}
+.block_graph .title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+}
+.block_graph .title:hover {
+    background: #1e2130;
+}
+.block_graph .title h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #c0c0cc;
+}
+.block_graph .data {
+    padding: 12px 16px 16px;
+    border-top: 1px solid #2a2d3a;
 }
 .chevron {
     height: 24px;
     width: 24px;
-    display: inline-block;
-    float: left;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
+
+/* ── Canvas ───────────────────────────────────────── */
+canvas {
+    border: 1px solid #2a2d3a;
+    border-radius: 6px;
+    background: #111320;
+    max-width: 100%;
+    height: auto;
+}
+
+/* ── Slide Modal ──────────────────────────────────── */
 .slide-modal {
     display: none;
     position: fixed;
-    z-index: 1;
-    padding-top: 100px;
+    z-index: 100;
+    padding-top: 60px;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.9);
+    background-color: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(8px);
 }
 .slide-modal-content {
     margin: auto;
     display: block;
     max-width: 700px;
+    border-radius: 8px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
 }
 #slidecaption {
     margin: auto;
@@ -78,36 +445,511 @@ canvas {
     width: 80%;
     max-width: 700px;
     text-align: center;
-    color: #ccc;
-    padding: 10px 0;
-    height: 150px;
+    padding: 16px 0 24px;
 }
-.slideclose {
-    position: absolute;
-    top: 15px;
-    right: 35px;
-    color: #f1f1f1;
-    font-size: 40px;
-    font-weight: bold;
-    transition: 0.3s;
+#slide-station-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #f0f0f5;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+}
+#slide-dls {
+    font-size: 16px;
+    color: #a0a0b8;
+    font-style: italic;
+    min-height: 22px;
+}
+.slide-modal-content {
+    max-width: 95vw;
+}
+.slide-modal {
+    cursor: pointer;
 }
 
-.slideclose:hover,
-.slideclose:focus {
-    color: #bbb;
-    text-decoration: none;
-    cursor: pointer;
+/* ── SNR Widget ───────────────────────────────────── */
+.snr-widget {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: #1a1d28;
+    border: 1px solid #2a2d3a;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+.snr-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 90px;
+}
+.snr-label-text {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8888a0;
+    margin-bottom: 4px;
+}
+.snr-value-text {
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: #f0f0f5;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+.snr-bar-zone {
+    flex: 1;
+    min-width: 200px;
+}
+.snr-bar-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+.snr-quality-badge {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 3px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.03em;
+}
+.snr-segments {
+    display: flex;
+    gap: 3px;
+    height: 22px;
+}
+.snr-seg {
+    flex: 1;
+    border-radius: 3px;
+    transition: background 0.3s;
+}
+.snr-seg-off {
+    background: #1a1e30;
+    border: 1px solid #22253a;
+}
+.snr-scale-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 11px;
+    color: #44445a;
+}
+
+/* ── Footer ───────────────────────────────────────── */
+.app-footer {
+    text-align: center;
+    padding: 24px 0 12px;
+    margin-top: 20px;
+    border-top: 1px solid #2a2d3a;
+    font-size: 14px;
+    color: #6a6a80;
+}
+#restartBtn {
+    background: transparent;
+    border: 1px solid #3a3d4a;
+    color: #6a6a80;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    box-shadow: none;
+    vertical-align: middle;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+#restartBtn:hover {
+    background: #1e2130;
+    border-color: #ef4444;
+    color: #ef4444;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ── Scrollbar ────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #12141d;
+}
+::-webkit-scrollbar-thumb {
+    background: #2a2d3a;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #3a3d4a;
+}
+
+/* Labels desktop/mobile */
+.label-mobile { display: none; }
+.ens-mobile-name { display: none; }
+
+/* ── Advanced controls (desktop: always visible inline) ── */
+.channel-ctrl { display: flex; align-items: center; gap: 8px; }
+.advanced-toggle { display: none; }
+.advanced-controls { display: contents; }
+
+/* ── Responsive - Tablet ──────────────────────────── */
+/* ── Responsive - Mobile ─────────────────────────── */
+@media (max-width: 900px),
+       (orientation: landscape) and (max-height: 600px) and (pointer: coarse) {
+    html {
+        overflow-x: hidden;
+    }
+    body {
+        font-size: 15px;
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+    .app-container {
+        padding: 14px 12px;
+        overflow-x: hidden;
+    }
+    .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+    }
+    .app-header .brand {
+        font-size: 1.4rem;
+    }
+    .links-bar {
+        display: none;
+    }
+    /* ── Carte unifiée header ─────────────────────── */
+    .header-card {
+        display: block;
+        background: #1a1d28;
+        border: 1px solid #2a2d3a;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 16px;
+    }
+    .controls-bar {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        row-gap: 10px;
+        column-gap: 16px;
+        padding: 14px 16px;
+        background: none;
+        border: none;
+        border-radius: 0;
+        margin-bottom: 0;
+    }
+    #mux-info {
+        padding: 0 16px 16px;
+        border-top: 1px solid #2a2d3a;
+        margin-bottom: 0;
+    }
+    /* Chaque control-group se dissout dans la grille :
+       label → colonne 1, contrôle → colonne 2 */
+    .control-group {
+        display: contents;
+    }
+    .control-group label {
+        font-size: 14px;
+        white-space: nowrap;
+    }
+    select {
+        min-width: 0;
+        padding: 12px 36px 12px 14px;
+        font-size: 16px;
+    }
+    #channelselector {
+        width: auto;
+    }
+    .channel-ctrl {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-self: start;
+    }
+    input[type="checkbox"] {
+        width: 26px;
+        height: 26px;
+        justify-self: start;
+    }
+    /* ── Zone avancée déroulante ─────────────────────── */
+    .advanced-controls {
+        display: none;
+    }
+    .advanced-controls.open {
+        display: contents;
+    }
+    /* Bouton toggle réglages avancés */
+    .advanced-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        padding: 12px 14px;
+        background: #252836;
+        border: 1px solid #3a3d4a;
+        border-radius: 8px;
+        color: #8888a0;
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+        line-height: 1;
+        box-shadow: none;
+        transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .advanced-toggle:hover {
+        background: #2e3145;
+        border-color: #6ea8fe;
+        color: #6ea8fe;
+        box-shadow: none;
+    }
+    .advanced-toggle::before {
+        content: none;
+    }
+    .advanced-toggle.open {
+        border-color: #6ea8fe;
+        color: #6ea8fe;
+        background: #1e2440;
+    }
+    #mux-info h1.ens-ps8,
+    #mux-info h2.ens-ps16 {
+        display: none;
+    }
+    .ens-mobile-name {
+        display: block;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #22c55e;
+        letter-spacing: -0.01em;
+        word-break: break-word;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    .label-desktop {
+        display: none;
+    }
+    .label-mobile {
+        display: inline;
+    }
+
+    /* ── Stats table : pleine largeur, sans carte propre ─ */
+    table.stats-table {
+        width: 100%;
+        table-layout: fixed;
+        border: none;
+        background: none;
+        margin-bottom: 10px;
+    }
+    table.stats-table th,
+    table.stats-table td {
+        padding: 3px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    /* Hide less essential stats columns on mobile:
+       col5=FreqCorr, col7=LTO, col8=FIC CRC, col9=Tuned at, col10=FCT0 */
+    table.stats-table th:nth-child(n+5),
+    table.stats-table td:nth-child(n+5) {
+        display: none;
+    }
+
+    /* SNR widget : sans carte propre (portée par .header-card) */
+    .header-card .snr-widget {
+        background: none;
+        border: none;
+        border-radius: 0;
+        padding: 10px 0 0;
+        margin-bottom: 0;
+        flex-direction: column;
+        align-items: center;
+    }
+    .header-card .snr-bar-zone {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* ── Services table: CARD LAYOUT ─────────────── */
+    #ensembleinfo table {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        box-sizing: border-box;
+        border: none;
+        overflow: visible;
+    }
+    /* Hide table header row */
+    #ensembleinfo table tr:first-child {
+        display: none;
+    }
+    /* Each service row becomes a card */
+    #ensembleinfo table tr {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        width: 100%;
+        box-sizing: border-box;
+        background: #1a1d28;
+        border: 1px solid #2a2d3a;
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 10px;
+        gap: 8px;
+    }
+    #ensembleinfo table tr:hover {
+        background: #1e2130;
+    }
+    #ensembleinfo table td {
+        border: none;
+        padding: 0;
+        background: none !important;
+        white-space: normal;
+    }
+    /* Col 1: Station name - top left, takes most width */
+    #ensembleinfo table td:nth-child(1) {
+        flex: 1 1 55%;
+        font-weight: 600;
+        font-size: 16px;
+        color: #f0f0f5;
+        min-width: 0;
+        word-break: break-word;
+    }
+    /* Col 12: Play button - top right */
+    #ensembleinfo table td:nth-child(12) {
+        flex: 0 0 auto;
+        order: -1;
+        margin-left: auto;
+    }
+    /* Col 13: SLS thumbnail - full width at bottom */
+    #ensembleinfo table td:nth-child(13) {
+        flex: 1 1 100%;
+        order: 4;
+        display: flex;
+        justify-content: center;
+    }
+    #ensembleinfo table td:nth-child(13) .sls-thumb {
+        width: 100%;
+        height: auto;
+        max-height: 180px;
+        border-radius: 8px;
+    }
+    /* Col 3: Bitrate - hidden on mobile */
+    #ensembleinfo table td:nth-child(3) {
+        display: none;
+    }
+    /* Col 9: DLS - full width below */
+    #ensembleinfo table td:nth-child(9) {
+        flex: 1 1 100%;
+        font-size: 13px;
+        color: #b0b0c0;
+        order: 3;
+        min-height: 0;
+    }
+    /* Hide non-essential columns:
+       col2=SId, col4=CU, col5=Prot, col6=Tech, col7=PTy, col8=Lang, col10=Errors, col11=AudioLevel */
+    #ensembleinfo table td:nth-child(2),
+    #ensembleinfo table td:nth-child(4),
+    #ensembleinfo table td:nth-child(5),
+    #ensembleinfo table td:nth-child(6),
+    #ensembleinfo table td:nth-child(7),
+    #ensembleinfo table td:nth-child(8),
+    #ensembleinfo table td:nth-child(10),
+    #ensembleinfo table td:nth-child(11) {
+        display: none;
+    }
+
+    /* ── Mobile button sizes ─────────────────────── */
+    button {
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+    button[onclick^="setPlayerSource"] {
+        padding: 9px 18px;
+        font-size: 14px;
+        min-width: 70px;
+        border-radius: 8px;
+    }
+    button[onclick^="setPlayerSource"]::before {
+        font-size: 12px;
+    }
+    button[onclick="stopPlayer()"] {
+        padding: 9px 18px;
+        font-size: 14px;
+        border-radius: 8px;
+    }
+    button[onclick^="showSlide"] {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    /* ── Mobile graph blocks ─────────────────────── */
+    .block_graph .title {
+        padding: 14px 16px;
+    }
+    .block_graph .title h2 {
+        font-size: 1rem;
+    }
+    .block_graph .data {
+        padding: 10px 12px 14px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── Mobile modal ────────────────────────────── */
+    .slide-modal {
+        padding-top: 30px;
+    }
+    #slidecaption {
+        width: 95%;
+        font-size: 14px;
+    }
+
+    .app-footer {
+        font-size: 13px;
+        padding: 16px 0 10px;
+    }
 }
 </style>
     </head>
     <body>
-        <div>
-            <div>
-                Channel: <select id="channelselector" name="channel"></select>
-                FFT Placement: <select id="fftwindowselector" name="fftwindow"></select>
-                Coarse freq corrector: <input type="checkbox" id="coarsecheckbox">
-                <p><a href="/mux.m3u">Get m3u playlist</a>. <a href="/mux.json">Get mux json</a>. <a href="/fic">Get FIC stream</a>.</p>
+        <div class="app-container">
+            <div class="app-header">
+                <div class="brand">welle<span>.io</span></div>
+                <div class="links-bar">
+                    <a href="/mux.m3u">M3U Playlist</a>
+                    <a href="/mux.json">MUX JSON</a>
+                    <a href="/fic">FIC Stream</a>
+                </div>
             </div>
+
+            <div class="header-card">
+                <div class="controls-bar">
+                    <div class="control-group">
+                        <label for="channelselector">Channel</label>
+                        <div class="channel-ctrl">
+                            <select id="channelselector" name="channel"></select>
+                            <button type="button" class="advanced-toggle" id="advancedToggle" title="Réglages avancés">Param. ⚙</button>
+                        </div>
+                    </div>
+                    <div class="advanced-controls" id="advancedControls">
+                        <div class="control-group">
+                            <label for="fftwindowselector">FFT Placement</label>
+                            <select id="fftwindowselector" name="fftwindow"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="coarsecheckbox">Coarse Corrector</label>
+                            <input type="checkbox" id="coarsecheckbox">
+                        </div>
+                    </div>
+                </div>
+                <div id="mux-info"></div>
+            </div>
+
             <div id="ensembleinfo"></div>
 
             <div id="block_spectrum" class="block_graph">
@@ -131,22 +973,38 @@ canvas {
             <div id="block_tii" class="block_graph">
                 <div class="title"><div class="chevron"></div><h2>TII Info</h2></div>
                 <div class="data" style="display: none" id="tiiinfo"></div>
-            </div>   
-
+            </div>
         </div>
+
         <div>
             <audio id="player">
                 <!--<source src="/mp3/0x4f57" type="audio/mpeg"> -->
             </audio>
         </div>
         <div id="mySlideModal" class="slide-modal">
-            <span class="slideclose">&times;</span>
             <img class="slide-modal-content" id="slideimg">
-            <div id="slidecaption"></div>
+            <div id="slidecaption">
+                <div id="slide-station-name"></div>
+                <div id="slide-dls"></div>
+            </div>
+        </div>
+
+        <div class="app-container">
+            <div class="app-footer">
+                welle.io &mdash; DAB and DAB+ Software Defined Radio (SDR).
+                <a href="https://github.com/AlbrechtL/welle.io/">GitHub</a> &middot;
+                <a href="https://www.welle.io">Website</a>
+                &middot; <button type="button" id="restartBtn" title="Restart welle-cli">↺ Restart</button>
+            </div>
         </div>
 
         <script type="text/javascript" src="/index.js"></script>
-        
-        <div align="center"><p>welle.io and welle-cli is DAB and DAB+ software defined radio (SDR). For more information visit <a href="https://github.com/AlbrechtL/welle.io/">https://github.com/AlbrechtL/welle.io/</a> and <a href="https://www.welle.io">https://www.welle.io</a></p></div>
+        <script>
+        document.getElementById('advancedToggle').addEventListener('click', function() {
+            var ac = document.getElementById('advancedControls');
+            var isOpen = ac.classList.toggle('open');
+            this.classList.toggle('open', isOpen);
+        });
+        </script>
     </body>
 </html>

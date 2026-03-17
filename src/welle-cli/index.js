@@ -3,6 +3,8 @@ var channels = [ "5A", "5B", "5C", "5D", "6A", "6B", "6C", "6D", "7A", "7B",
 "10C", "10D", "11A", "11B", "11C", "11D", "12A", "12B", "12C", "12D", "13A",
 "13B", "13C", "13D", "13E", "13F"];
 
+var tii_db = {};
+
 var fft_window_placements = [ "StrongestPeak", "EarliestPeakWithBinning", "ThresholdBeforePeak" ];
 
 var png_noslide = "iVBORw0KGgoAAAANSUhEUgAAAUAAAADwCAYAAABxLb1rAAAPM0lEQVR4nO3dLZejzBZAYX4FOh4fHY9uj2+Nx6Pjo+PxaDweXX+irpiV9/Zk0h2gThWn+uxnrXKzBooku0P4KjwAGFUcvQIAcBQCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCDOcc34cx5djWZajVw8HIICKffdhXTOkP9A/xeOI9Xm3rsMw+K7r/OVy8afTyRdFsXpcLhffNI3v+97P85xsvZEeAVRsy4f2eZxOJ++cE1uXcRyD1qfrOrF1ecU552+3m6/rOmg9X42yLH3TNH6apqhzQHoEULHQD+7n56fYumgN4LIsvm1bX5alePi++8Nyu92izAXpEUDFJD6wUt9atAXQOee7rksWvlchHIZBdE5IjwAqJvVBldgV1hTAeZ43/64Xa9R1LfpTA9IigIpJfUg/Pj6C10VLAO/3++HRex5lWXKwJFMEUDHJD2no7pqGAH58fBweu58ieL/fg+eItAigYtIf0JBdtaMDqDl+XwcRzAsBVEz6w1nX9e51OTKA1+v18LCtHewO54UAKhbjA7p3V/ioAE7TdHjUtg7pczARDwFULNY3lD0fziMC6Jw77DSX0BHybRvpEEDFYn04z+fz5nU5IoCfn5+HhyxkcOWIfgRQsZgfzuv1umldUgdwWRbxOVdV5buu88Mw/HWdctd1vq5r8W+bVVVtmjPSI4CKxQxgWZabblCQOoBN04jN9Xw+rzowEePqEq4W0Y0AKhYzgI8wrJUygJLf/rZ+0/X+Twirqkq+jZEeAVQsdgC3BCJlALuuE5lbyDl5khHkXoN6EUDFUgRw7XlrKQMocZ2vxJUnUkeh+74PXhfEQQAVSxHAolj3Y32qAM7zHDwfyfPwbrdbku2LYxBAxVIFcE2gUgWw7/vguUh/45L4RgqdeGUUSxnAoih+3BVOFUCJOzpLX4XRtm3wOo3jKLpOkEEAFUsdwJ921VIFMPTbVozdTYnd8tiPBMA+BFCx1AH86YOaKoCh69+2reRLILZeTdNEWS+EIYCKHRHAonh9CVeKAIYuoyiKaM/ruFwuQet1uVyirBfCEEDFjgrgq6OouQQw1m9tBPB3IoCKHRXAovj3iXIpAihxBDjWSccSJ2dDH14VxUIDFnoS79dd4RQB1BwZzeuG/XhVFAsNzjAMQf/H111hAqh33bAfr4piEsEJPa/u8UQ5Aqh33bAfr4piEsGRuJ71cf88Aqhz3bAfr4piUsEJfa7G45GPBFDnumE/XhXFJIMTenv50Cs0UgUw1sOIQm/QWpZllPVCGAKomGRwnHMiF/XHDCDnASI1AqiYdHCOfMRkqgDGugV96M1RCaBOBFCxGME56klrawLonEuynD1C1yvWNcoIQwAVixGCo3aFU90MIcbzeCW+mXI3GJ0IoGKxPnASt3eKFYDQ39qKQv4tLXGJHvcD1IkAKhYzOFIPHpIOoMR6Sd8RRuLhSLGOTiMMAVQsdnCknnomGcDQy/eKQvZRlBIHjngmiF4EULHYwUm5K7zlNzCJJ7FJHQ0+n8/B68IBEL0IoGIpgpNqV3hLAENPOi6K9Y/7/Mn1ehWZe+h6IB4CqFiq4KTYFd6yPlLnK4ZEMPTSv8c4nU67lo80CKBiqYKzLIvIbqfU+ngvF+WyLDdvC4kn0z0GD0XXjQAqljI4Urt7UusjcTDkOYRt2/phGP65a/Q8z/52u4mG77FMjv7qRgAVSxkc72V+8M9lfVKM6/W6ec5IiwAqljo4MXeF96zPESdsSw1OfckDAVQsdXC8j7crrG19Yg6JI9BIgwAqdkRwvA+/jX4O6xNz3O/33XNFWgRQsaOCI3Ebfen1SXnVSsh4fpwodCOAih0VHO/lj8KGrk8OEXw8QAr5IICKHRkc72V3PSXWR3MEud1VngigYkd/ICV3hSUDcdRNXV+Nsiyj3YUa8RFAxTQER2pXWPob0jRNhz7jpCj+3HyVE53zRgAV0xIciW9csXYRb7db8hCez2c/TVOU+SAtAqiYluBI3EY/9m9kMS5l+zrKsvRN0xC+X4YAKtZ13e4hfQv2eZ5Vrc93nHN+GAbftq3Ioywf1w/jdyKA+PWcc34cRz+Oo+/7/ttID8Pgx3H852YJ+L0IIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzCCAAswggALMIIACzzARwHEc/jqO/3W6+67pvx+PfLcty9CoDiOxXBnCeZ991nb9cLr4sS18Uxe5xuVx827Z+GIYo67osy49BXjO0xHocx+RzefcHTXoMw3DIH8jU8wwdt9st6fbZ69cE8BGS0+kUFLyfRlmWvmkaP02T2HqP4xi8XuM4iq1PiK7rks/lcrlEe701/IHUMs892yUH2QfQOec/Pz+Tv8Dn89nP8xy8/gQwbC6awlCWpW/bNsq3Q03zXDMIYALDMATv4oaOruuC5kAAw+aiNQxd13nnnNi21TrP7wYBjEziwyY1Pj4+ds+DAIbNRXMYTqeTyF6C9nm+GgQwoo+Pj8Nf4OexN4IEMGwuOYThfr8Hb9sc5vl1EMBI7vf74S/ud2PP7jABDJtLLmEIjWAu83wMAhjBsiyHv7DvxtYfwAlg2FxyCkNIBHOaZ1EQwCjO5/PhL+y7cT6fN82JAIbNJbcw7P1NMLd5EkBh0zSJvTBfT9hsmsZXVXXYm5wAhs0ltzCcTqddR4dzmycBFNY0TdAL8vn5+eMbb1mW4GU8Rtu2q+dFAMPmklsYHu/FrXKbJwEUFnK+35aDExIHWU6n0+rlEcCwueQWhsfY+ltxbvMkgIJCIlGW5eblSXyQ1+4GE8CwuYSGoSxLf7lcXo6YJ9k3TZN0nkWRxUc9uSy2yu122/2i7/1LFHpNcd/3q5ZDAI8N4Lv3h3POD8Pgm6YRD+KWb4EEMI4stkrIB2vL7uhXbdsGvdnW/g5IAHUH8Cvp687X/pGUmCcBfC2LrRL6wbper5uXOc/z6v//1W7U2tsBEcB8AvggdTJ+VVXJ5kkAX8tiq0h8sOq63vzD8/M94GLcLJUA5hdA773YN8G17yUCGEcWW2UYBpE3W1H8+avb972aaBDAPAPonBP5TXDtngIBjCOLrbJld3TPB+BxQ0vJ2xetRQDzDKDUfNceDSaAcWSzVWLe6fnrqKoqaRAJYL4BlPjDvHb5BDCObLZK6FHZkDdo3/fRngFBAPMNoPdhJ+hvCZNEAHkWyL+yCaCGO8E8fj+U/GZIAPMOoESY1vxxzeVKkFyuAHnIJoDeyx15kxhN04h8KySAYXM5OoCp5kwA48gqgM458Tu3hI6maYK+ERLAsLn8hgCueaIcAYwjqwB6/2dX+OgHIT2Psix3PxaRAIbN5egASpyiteZmHQQwjuwC6P2fo2+pjgpLv5GfEcCwuRwdQInXjwAeJ8sAev9nd1jjHaK3PhyJAIbNhQDqGgQwsdvtpm6XeMu1xwQwbC4EUNcggAdwzvmu61SFkPsBppkLAdQ1COCBnHP+drupOFK89uFIBDBsLgRQ1yCASszz7Nu2PfRgyTRNb9eTAIbNhQDqGgRQoWVZfN/3vq7rpLvJay50J4Bhczk6gH3fB8851XmAXAr3LxMBfDbPs+/73jdNE/Ub4prnkRDAvAOY05Ug+Bdbxf8/iDF+O3x3MIQA5h1AiUepEsDjsFWeTNMken7hu90bAph3AFOFiQDG8Su2yjzPf92yvu9733Vd0M0KpJ778O4HbgKYbwCdc8HzXfvYVgIYh+qtMo6j77rON03z1wOH1v5ut+WpW69cr1cCuIG1AIY8rnXr8glgHKq3SugRtq0Pn34l9CAJAfy9AZT4qWTt9eMEMA7VWyU0DnufCfxV6J2oCeDvDKDE3sGW+RLAOFRvFYnfWNacjPyT0A/1uzc4AcwvgPM8i5xPuvb3P4l5EsDX1G+V0FNT1l6S9p26roOW/+5ADAHMK4DX61XsZPq2bZPNkwC+pn6rSDwMacvdWb4KfQ7Jml1wiQCmGu/i9NsC6Jzz4zj6YRiiXFa55SwFAhiH+q0i9Uzg+/2+abkSt99f8xeeAG5bxrNcrpF9HlsP0OU4zz03CE5NfQC9l3smcF3Xq/7qTtMkclXImmURwG3LeJZjGNa+N3KfJwEUInG+1ddxuVx813V/nTw9DIPvuk7scri6rlfNjQBuW8YzK2GwMs/Usgig93LfAlONtX/hCeC2ZTzLLQxVVW2aX67zLAoCKGqapsNf0BgvPAHctoxnOYWhLMvdl2fmNM/HIIDCND0Y/bux9S88Ady2jGe5hKEsy9WPSch5nl8HARSm8cHoX0dVVZsfkk4Aty3jWQ5hCI1fLvN8HgQwAq0R3BM/7wng1mU80x6GqqqC45fDPF8NAhiJtgiez+dd8fOeAG5dxjPNYfj8/Nz9vshpnt8NAhiRc+7w3wTLstx9lckDAdy2jGcaw3A+n4OvQc9hnu8GAUxgWRaR25JvGWVZ+q7rRP66E8Bty3imJQxVVfm2bYNuwpvDPLcMApjQ48lvMXeNq6ryfd+L7dZ4TwC3LuPZEWE4nU7/nUw/DIPo+0HTPEMHATyIc+6/Kzvqut4VxVRv8scF9zmMd9tgWZboy3j2/DiEmCPWtztt8/wN22utXxnAn7z7kKb4aw5AB3MBBIAHAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwCwCCMAsAgjALAIIwKz/AZGDvwWYdltdAAAAAElFTkSuQmCC";
@@ -94,9 +96,18 @@ window.onload = function() {
 
     ch.onchange = function() {
         var channel = document.getElementById("channelselector").value;
+        currentPlayingSid = null;
         var xhr = new XMLHttpRequest();
         xhr.open("POST", '/channel', true);
         xhr.setRequestHeader("Content-type", "text/plain");
+        xhr.timeout = 8000;
+        ch.disabled = true;
+        var enableCh = function() { ch.disabled = false; };
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) { enableCh(); }
+        };
+        xhr.ontimeout = enableCh;
+        xhr.onerror = enableCh;
         xhr.send(channel);
     };
 
@@ -130,6 +141,17 @@ window.onload = function() {
     }
 };
 
+    var restartBtn = document.getElementById("restartBtn");
+    if (restartBtn) {
+        restartBtn.onclick = function() {
+            if (confirm("Restart welle-cli?")) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", '/restart', true);
+                xhr.send();
+            }
+        };
+    }
+
 function refreshChannel() {
     var r = new XMLHttpRequest();
     r.onreadystatechange = function () {
@@ -144,36 +166,45 @@ var channelRefreshTimer = setInterval(refreshChannel, 2000);
 
 var ensembleInfoTimer = setInterval(populateEnsembleinfo, 1000);
 
-function ensembleInfoTemplate() {
+var currentPlayingSid = null;
+var currentSlideSid = null;
+var currentSlideLastUpdate = 0;
+var slsCache = {}; // sid -> {time, blobUrl} — slide images stored as local blob URLs
+
+function muxHeaderTemplate() {
     var html = '';
-    html += ' <h1><abbr title="Ensemble long and short labels defined in FIG1">${label} (${shortlabel})</abbr></h1>';
-    html += ' <h2><abbr title="Ensemble long and short labels defined in FIG2">${fig2label}</abbr></h2>';
-    html += ' <div align="right"><p><abbr title="${hw_name}, ${sw_name}">This is welle-cli build version ${version}</abbr></p></div>';
-    html += ' <table id="servicetable">';
-    html += ' <tr><th>Ensemble ID </th>';
-    html += ' <th>ECC </th>';
-    html += ' <th>SNR </th>';
-    html += ' <th>RX gain </th>';
-    html += ' <th>Freq corr</th>';
-    html += ' <th>Date</th></th>';
-    html += ' <th><abbr title="Local Time Offset">LTO</abbr></th></th>';
-    html += ' <th>FIC CRC Errors</th>';
-    html += ' <th>Tuned at</th>';
-    html += ' <th>FCT0 frame received at</th>';
-    html += ' </tr>';
-    html += ' <tr><td>${EId}</td>';
-    html += ' <td>${ecc}</td>';
-    html += ' <td>${SNR}</td>';
-    html += ' <td>${gain}</td>';
-    html += ' <td>${FrequencyCorrection}</td>';
-    html += ' <td>${year}-${month}-${day} ${hour}:${minutes} UTC</td>';
-    html += ' <td>${lto}</td>';
-    html += ' <td>${ficcrcerrors}</td>';
-    html += ' <td>${lastchannelchange}</td>';
-    html += ' <td>${lastfct0frame}</td></tr>';
-    html += ' </table><br>    <button type=button onclick="stopPlayer()">Stop</button><br><br>';
-    html += '';
-    html += '<table id="servicetable">';
+    html += '<h1 class="ens-ps8"><abbr title="Ensemble long and short labels defined in FIG1">${label} (${shortlabel})</abbr></h1>';
+    html += '<h2 class="ens-ps16"><abbr title="Ensemble long and short labels defined in FIG2">${fig2label}</abbr></h2>';
+    html += '<div class="ens-mobile-name">${mobilelabel_ens}</div>';
+    html += '<table class="stats-table">';
+    html += '<tr><th>Ensemble ID</th>';
+    html += '<th>ECC</th>';
+    html += '<th>SNR</th>';
+    html += '<th>RX gain</th>';
+    html += '<th>Freq corr</th>';
+    html += '<th>Date</th>';
+    html += '<th><abbr title="Local Time Offset">LTO</abbr></th>';
+    html += '<th>FIC CRC Errors</th>';
+    html += '<th>Tuned at</th>';
+    html += '<th>FCT0 frame received at</th>';
+    html += '</tr>';
+    html += '<tr><td>${EId}</td>';
+    html += '<td>${ecc}</td>';
+    html += '<td>${SNR}</td>';
+    html += '<td>${gain}</td>';
+    html += '<td>${FrequencyCorrection}</td>';
+    html += '<td>${year}-${month}-${day} ${hour}:${minutes} UTC</td>';
+    html += '<td>${lto}</td>';
+    html += '<td>${ficcrcerrors}</td>';
+    html += '<td>${lastchannelchange}</td>';
+    html += '<td>${lastfct0frame}</td></tr>';
+    html += '</table>';
+    html += '${snr_widget}';
+    return html;
+}
+
+function ensembleInfoTemplate() {
+    var html = '<table id="servicetable">';
     html += '<tr><th>FIG1 Label (Short label)<br>FIG2 Label</th> ';
     html += '<th><abbr title="Service ID">SId</abbr></th> ';
     html += '<th>Bitrate</th> <th><abbr title="Start CU Address, used CUs">CU info</abbr></th> ';
@@ -182,25 +213,25 @@ function ensembleInfoTemplate() {
     html += '<th><abbr title="Programme type">PTy</abbr></th>';
     html += '<th><abbr title="Service language, Subchannel language">Languages</abbr></th> <th id="dls">DLS</th>';
     html += '<th><abbr title="Frame, Reed Solomon, AAC errors">Errors</abbr></th>';
-    html += '<th><abbr title="red: right, black: left">Audio Level</abbr></th> <th></th></tr>';
+    html += '<th><abbr title="red: right, black: left">Audio Level</abbr></th> <th></th><th></th></tr>';
     html += '${services}</table>';
     return html;
 }
 
 function serviceTemplate() {
-    var html = '<tr><td>${label} (${shortlabel})<br>${fig2label}</td> <td>${SId}</td> <td>${bitrate}&nbsp;kbps</td> <td>${sad_cu}</td> <td>${protection}</td>';
+    var html = '<tr><td><span class="label-desktop">${label} (${shortlabel})<br>${fig2label}</span><span class="label-mobile">${mobilelabel}</span></td> <td>${SId}</td> <td>${bitrate}&nbsp;kbps</td> <td>${sad_cu}</td> <td>${protection}</td>';
     html += '<td>${techdetails}</td>';
     html += '<td>${pty}</td> <td>${language}<br>${subchannel_language}</td> <td><i>${dls}</i></td>';
     html += '<td>${errorcounters}</td>';
     html += '<td><canvas id="${canvasid}" width="64" height="12"></canvas></td>';
-    html += '<td><button type=button ${buttondisabled} class="${buttonclass}" onclick="setPlayerSource(${SId})">Play</button></td>';
+    html += '<td>${playbutton}</td>';
+    html += '<td class="sls-cell"><img id="sls-${sid}" class="sls-thumb" src="${slssrc}" alt="" onclick="showSlide(${sid_num}, ${mot_time})" style="${slsvisible}"></td>';
     html += '</tr>';
     return html;
 }
 
 function tiiTemplate() {
-    var html = '<li>MainId ${pattern} SubId ${comb} ${delay} samples = <b>${delay_km} km</b>';
-    html += ' error: ${error}</li>';
+    var html = '<li>MainId ${pattern} SubId ${comb}${site_name}</li>';
     return html;
 }
 
@@ -210,30 +241,37 @@ function playerLoad() {
 }
 
 function setPlayerSource(sid) {
+    currentPlayingSid = sid;
     document.getElementById("player").src = "/stream/" + sid;
     playerLoad();
 }
 
 function stopPlayer() {
+    currentPlayingSid = null;
     document.getElementById("player").src = "";
     playerLoad();
 }
 
 var slide_modal = document.getElementById('mySlideModal');
 var slideimg = document.getElementById("slideimg");
-var slidecaption = document.getElementById("slidecaption");
+var slideStationName = document.getElementById("slide-station-name");
+var slideDls = document.getElementById("slide-dls");
 
 function showSlide(sid, last_update_time) {
-    slideimg.src = "slide/" + sid + "?cachebreak=" + last_update_time;
-    var last_update = new Date(last_update_time * 1000);
-    slidecaption.innerHTML = last_update;
+    currentSlideSid = sid;
+    currentSlideLastUpdate = last_update_time;
+    slideimg.src = "slide/" + sid + "?t=" + Date.now();
+    var cached = slsCache[String(sid)] || slsCache["0x" + sid.toString(16).toUpperCase()];
+    slideStationName.textContent = (cached && cached.stationName) ? cached.stationName : "";
+    slideDls.textContent = (cached && cached.dls) ? cached.dls : "";
     slide_modal.style.display = "block";
 }
 
-var slideclose = document.getElementsByClassName("slideclose")[0];
-slideclose.onclick = function() {
+slide_modal.addEventListener("click", function() {
     slide_modal.style.display = "none";
-}
+    currentSlideSid = null;
+    currentSlideLastUpdate = 0;
+});
 
 function parseTemplate(template, data) {
    return template.replace(/\$\{(\w+)\}/gi, function(match, parensMatch) {
@@ -259,6 +297,63 @@ function drawCIRPeaks(cirs) {
         ctx.fillText(i, cirs[cir].index/4, h);
         i++;
     }
+}
+
+function getSNRInfo(snr) {
+    if (snr < 4)  return {quality: "No signal", color: "#ef4444", bg: "rgba(239,68,68,0.13)",  border: "rgba(239,68,68,0.35)"};
+    if (snr < 8)  return {quality: "Poor",      color: "#f97316", bg: "rgba(249,115,22,0.13)", border: "rgba(249,115,22,0.35)"};
+    if (snr < 12) return {quality: "Marginal",  color: "#eab308", bg: "rgba(234,179,8,0.13)",  border: "rgba(234,179,8,0.35)"};
+    if (snr < 18) return {quality: "Good",      color: "#84cc16", bg: "rgba(132,204,22,0.13)", border: "rgba(132,204,22,0.35)"};
+    return             {quality: "Excellent",  color: "#22c55e", bg: "rgba(34,197,94,0.13)",  border: "rgba(34,197,94,0.35)"};
+}
+
+function buildSNRWidget(snr) {
+    var maxSnr  = 20;
+    var numSeg  = 20;
+    var filled  = Math.round(Math.min(numSeg, Math.max(0, snr / maxSnr * numSeg)));
+    var info    = getSNRInfo(snr);
+
+    /* Couleur par segment (20 dB max, 1 dB par segment) :
+       0-3  (0–4 dB)    rouge
+       4-7  (4–8 dB)    orange
+       8-11 (8–12 dB)   jaune
+       12-19(12–20 dB)  vert   */
+    var segColors = [
+        '#ef4444','#ef4444','#ef4444','#ef4444',
+        '#f97316','#f97316','#f97316','#f97316',
+        '#eab308','#eab308','#eab308','#eab308',
+        '#22c55e','#22c55e','#22c55e','#22c55e','#22c55e','#22c55e','#22c55e','#22c55e'
+    ];
+
+    var segs = '';
+    for (var i = 0; i < numSeg; i++) {
+        if (i < filled) {
+            var c = segColors[i];
+            segs += '<div class="snr-seg" style="background:' + c +
+                    ';box-shadow:0 0 6px ' + c + '99"></div>';
+        } else {
+            segs += '<div class="snr-seg snr-seg-off"></div>';
+        }
+    }
+
+    var html = '<div class="snr-widget">';
+    html += '<div class="snr-info">';
+    html += '<span class="snr-label-text">SNR</span>';
+    html += '<span class="snr-value-text">' + snr.toFixed(1) + '&thinsp;dB</span>';
+    html += '</div>';
+    html += '<div class="snr-bar-zone">';
+    html += '<div class="snr-bar-header">';
+    html += '<span class="snr-quality-badge" style="color:' + info.color +
+            ';background:' + info.bg + ';border:1px solid ' + info.border + '">' +
+            info.quality + '</span>';
+    html += '</div>';
+    html += '<div class="snr-segments">' + segs + '</div>';
+    html += '<div class="snr-scale-row">';
+    html += '<span>0 dB</span><span>5</span><span>10</span><span>15</span><span>20 dB</span>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    return html;
 }
 
 function drawAudiolevels(services) {
@@ -319,6 +414,21 @@ function populateEnsembleinfo() {
             return a.sad - b.sad;
         });
 
+        // Preload new slide images before rebuilding DOM
+        for (var pkey in data.services) {
+            var psvc = data.services[pkey];
+            if (psvc.mot && psvc.mot.time > 0) {
+                var psid = psvc.sid;
+                if (!slsCache[psid] || slsCache[psid].time !== psvc.mot.time) {
+                    var purl = "slide/" + parseInt(psid) + "?t=" + psvc.mot.time;
+                    var prevEntry = slsCache[psid] || {};
+                    slsCache[psid] = {time: psvc.mot.time, url: purl, stationName: prevEntry.stationName || "", dls: prevEntry.dls || ""};
+                    var pimg = new Image();
+                    pimg.src = purl;
+                }
+            }
+        }
+
         var servicehtml = "";
         for (ix in start_addresses) {
             var key = start_addresses[ix].key;
@@ -327,6 +437,7 @@ function populateEnsembleinfo() {
             s["label"] = service.label.label;
             s["fig2label"] = service.label.fig2label;
             s["shortlabel"] = service.label.shortlabel;
+            s["mobilelabel"] = service.label.fig2label || service.label.label;
             s["SId"] = service.sid;
             s["buttondisabled"] = "disabled";
             s["buttonclass"] = "disabled";
@@ -359,12 +470,6 @@ function populateEnsembleinfo() {
 
             s["dls"] = "";
 
-            if (service.mot && service.mot.time > 0) {
-                s["dls"] += '<button type=button onclick="showSlide(';
-                s["dls"] += service.sid + ', ' + service.mot.time;
-                s["dls"] += ')">SLS</button>';
-            }
-
             if (service.dls) {
                 var last_update = new Date(service.dls.time * 1000);
                 s["dls"] += ' <span title="Updated ' + last_update + '">' + service.dls.label + '</span>';
@@ -393,6 +498,21 @@ function populateEnsembleinfo() {
                 s["errorcounters"] = "";
             }
 
+            if (parseInt(service.sid) === currentPlayingSid) {
+                s["playbutton"] = '<button type=button onclick="stopPlayer()">Stop</button>';
+            } else if (s["buttondisabled"] === "") {
+                s["playbutton"] = '<button type=button onclick="setPlayerSource(' + service.sid + ')">Play</button>';
+            } else {
+                s["playbutton"] = '<button type=button disabled class="disabled">Play</button>';
+            }
+
+            var cached = slsCache[service.sid];
+            s["sid"] = "sls-" + service.sid;
+            s["sid_num"] = service.sid;
+            s["mot_time"] = cached ? cached.time : 0;
+            s["slssrc"] = cached ? cached.url : "";
+            s["slsvisible"] = cached ? "" : "display:none";
+
             servicehtml += parseTemplate(serviceTemplate(), s)
         }
 
@@ -400,6 +520,7 @@ function populateEnsembleinfo() {
         ens["label"] = data.ensemble.label.label;
         ens["fig2label"] = data.ensemble.label.fig2label;
         ens["shortlabel"] = data.ensemble.label.shortlabel;
+        ens["mobilelabel_ens"] = data.ensemble.label.fig2label || data.ensemble.label.label;
         ens["EId"] = data.ensemble.id;
         ens["ecc"] = data.ensemble.ecc;
 
@@ -418,6 +539,7 @@ function populateEnsembleinfo() {
         ens["hw_name"] = data.receiver.hardware.name;
         ens["sw_name"] = data.receiver.software.name;
         ens["SNR"] = data.demodulator.snr.toFixed(1);
+        ens["snr_widget"] = buildSNRWidget(data.demodulator.snr);
         ens["FrequencyCorrection"] = data.demodulator.frequencycorrection;
         ens["services"] = servicehtml;
         ens["ficcrcerrors"] = data.demodulator.fic.numcrcerrors;
@@ -426,12 +548,22 @@ function populateEnsembleinfo() {
         var lfct0 = new Date(data.demodulator.time_last_fct0_frame);
         ens["lastfct0frame"] = lfct0.toISOString();
 
+        var muxInfo = document.getElementById('mux-info');
+        if (muxInfo) {
+            muxInfo.innerHTML = parseTemplate(muxHeaderTemplate(), ens);
+        }
+
         var ei = document.getElementById('ensembleinfo');
         ei.innerHTML = parseTemplate(ensembleInfoTemplate(), ens);
 
         tiihtml = "<ul>";
+        var eid = data.ensemble.id.substring(2).toUpperCase();
         for (key in data.tii) {
-            tiihtml += parseTemplate(tiiTemplate(), data.tii[key])
+            var tii = data.tii[key];
+            var tii_key = eid + '_' + tii.pattern.toString().padStart(2,'0') + tii.comb.toString().padStart(2,'0');
+            if (!tii_db[tii_key]) continue;
+            tii.site_name = ' \u2014 ' + tii_db[tii_key];
+            tiihtml += parseTemplate(tiiTemplate(), tii);
         }
         tiihtml += "</ul>";
 
@@ -441,6 +573,28 @@ function populateEnsembleinfo() {
         drawCIRPeaks(data.cir_peaks);
 
         drawAudiolevels(data.services);
+
+        // Update slsCache metadata and refresh modal if open
+        for (var key in data.services) {
+            var svc = data.services[key];
+            if (slsCache[svc.sid]) {
+                slsCache[svc.sid].stationName = svc.label ? (svc.label.fig2label || svc.label.label) : "";
+                slsCache[svc.sid].dls = (svc.dls && svc.dls.label) ? svc.dls.label : "";
+            }
+            if (currentSlideSid !== null && slide_modal.style.display === "block" &&
+                parseInt(svc.sid) === currentSlideSid) {
+                if (svc.mot && svc.mot.time > currentSlideLastUpdate) {
+                    showSlide(currentSlideSid, svc.mot.time);
+                } else {
+                    // Refresh DLS text even if image hasn't changed
+                    var c = slsCache[svc.sid];
+                    if (c) {
+                        slideStationName.textContent = c.stationName || "";
+                        slideDls.textContent = c.dls || "";
+                    }
+                }
+            }
+        }
     };
     r.open("GET", "/mux.json", true);
     r.send()
