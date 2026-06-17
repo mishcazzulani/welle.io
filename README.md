@@ -3,6 +3,9 @@
 This repository contains the implementation of an SDR DAB/DAB+ receiver.  
 Please see the project website https://www.welle.io for a user oriented documentation.
 
+**This fork** includes fixes for resource leaks that caused welle-cli to crash
+after days of continuous operation. See [Changes from upstream](#changes-from-upstream) below.
+
 **Build status**
 - Linux (Flatpak x86_64 and arm64): [![Linux build](https://github.com/AlbrechtL/welle.io/actions/workflows/linux.yml/badge.svg)](https://github.com/AlbrechtL/welle.io/actions/workflows/linux.yml)
 - Windows (Installer x86_64): [![Windows build](https://github.com/AlbrechtL/welle.io/actions/workflows/windows.yml/badge.svg)](https://github.com/AlbrechtL/welle.io/actions/workflows/windows.yml)
@@ -312,6 +315,58 @@ I would like to thanks to following open source projects. Without these great wo
 * [Opendigitalradio](https://www.opendigitalradio.org/)
 * FFTW
 * Qt
+
+## Changes from upstream
+
+This fork targets tag `2.7` and fixes four resource leaks in `welle-cli`
+that caused crashes after days of continuous operation:
+
+### 1. CLOSE_WAIT socket leak 
+`ProgrammeSender::wait_for_termination()` never checked whether the TCP
+socket was alive. Dead sockets accumulated in CLOSE_WAIT state until the
+file descriptor limit was exhausted.
+
+**Fix:** TCP keepalive (`SO_KEEPALIVE`, `TCP_KEEPIDLE=60s`,
+`TCP_KEEPINTVL=10s`, `TCP_KEEPCNT=3`) on accepted sockets + drain
+`recv()` in every wait loop iteration to detect peer FIN.
+
+### 2. eventfd leak from std::async
+`serve()` used blocking `accept()` -- stale `std::async` futures were
+only cleaned up when a new connection arrived. Each async future
+allocated an internal eventfd that leaked until consumed.
+
+**Fix:** `select()` with 1-second timeout before `accept()`, so cleanup
+runs every second regardless of new connections. Also properly handles
+`launch::deferred` futures.
+
+### 3. MSG_PEEK false negative
+`recv(MSG_PEEK | MSG_DONTWAIT)` returned leftover data length instead
+of 0 even after FIN was received, preventing peer disconnect detection.
+614 threads + 611 FDs accumulated over 4 days.
+
+**Fix:** drain-buffer approach -- `recv()` into a discard buffer instead
+of `MSG_PEEK`. Stale data is consumed, and when the buffer is empty
+`recv()` returns 0 (clean shutdown).
+
+### 4. SIGABRT from uncaught std::system_error
+`std::async(launch::async)` throws `std::system_error` ("Resource
+temporarily unavailable") when the cgroup pids limit is hit. The
+uncaught exception called `std::terminate()` and crashed the process.
+
+**Fix:** wrap `std::async` in try-catch. Increased systemd `TasksMax`
+to 2048 (from the default ~759) for the `welle-cli.service` unit.
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `src/various/Socket.h` | + `native_handle()` for select() |
+| `src/various/Socket.cpp` | + `<netinet/tcp.h>`, keepalive in accept() |
+| `src/welle-cli/webprogrammehandler.h` | removed `const` from `wait_for_termination()` |
+| `src/welle-cli/webprogrammehandler.cpp` | drain `recv()` instead of `MSG_PEEK`, removed `const` |
+| `src/welle-cli/webradiointerface.cpp` | `select()` timeout, deferred handling, try-catch |
+
+5 files changed, 79 insertions(+), 6 deletions(-)
 
 ## Sponsors
 
